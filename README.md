@@ -98,9 +98,12 @@ You can use wildcards (as well as other special characters supported by
 Python's [glob module](https://docs.python.org/3.1/library/glob.html)) to specify
 groups of images under a path.
 
-Since Illustrator accepts a 'scaling' property for rendering and not a DPI,
+Since Illustrator accepts a `scaling` property for rendering and not a DPI,
 it is assumed your files were created with a DPI of 72.  If they weren't,
-use the 'srcdpi' to specify the source dpi.
+use the `srcdpi` to specify the source dpi.
+
+Inkscape accepts `width` and `height` properties for exact output dimensions.
+These properties override `dpi` - they're mutually exclusive.
 
 If you create `images/Icon.svg` at 57x57 *points* in inkscape, the above group
 called `appicons`

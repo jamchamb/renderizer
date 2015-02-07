@@ -58,15 +58,36 @@ def illustrator (infile, outfile, outputConfig, pluginConfig):
 
 def inkscape (infile, outfile, outputConfig, pluginConfig):
     """Render an image with inkscape"""
-    print 'Rendering', infile, 'to', outfile, 'at dpi', outputConfig['dpi'], 'with Inkscape.'
-    command = [
-        "inkscape",
-        "-d",
-        str(outputConfig['dpi']),
-        "-e",
-        outfile,
-        infile
-    ]
+    command = ["inkscape"]
+    
+    # Use width and height properties
+    if 'width' in outputConfig and 'height' in outputConfig:
+
+        # Don't allow dpi and width/height to be set
+        if 'dpi' in outputConfig:
+            raise Exception("DPI and dimension properties for Inkscape export are mutually exclusive.") 
+        
+        print 'Rendering', infile, 'to', outfile, 'at', str(outputConfig['width']), 'x', str(outputConfig['height']), 'px with Inkscape.'
+        command.extend([
+            "-w",
+            str(outputConfig['width']),
+            "-h",
+            str(outputConfig['height'])
+        ])
+
+    # Use DPI property
+    elif 'dpi' in outputConfig:
+        print 'Rendering', infile, 'to', outfile, 'at dpi', outputConfig['dpi'], 'with Inkscape.'
+        command.extend([
+            "-d",
+            str(outputConfig['dpi'])
+        ])
+        
+    else:
+        raise Exception("Invalid Inkscape export configuration for " + outfile)
+
+    command.extend(["-e", outfile, infile])
+        
     launch(command)
 
 def checkProps (names, pluginConfig, outputConfig):
