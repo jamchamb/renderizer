@@ -1,6 +1,6 @@
  #!/usr/bin/env python
 
-import os, subprocess, inspect, yaml, shutil, sys, glob
+import os, subprocess, inspect, yaml, shutil, sys, glob, hashlib
 from math import ceil
 
 class ModCheck (object):
@@ -28,6 +28,14 @@ class ModCheck (object):
             return True
         else:
             return False
+
+def hashConfig (yamlConfig):
+    """Generate SHA1 hash of an output or other YAML config."""
+    s = hashlib.sha1();
+    for field in yamlConfig:
+        s.update(field)
+        s.update(str(yamlConfig[field]))
+    return s.hexdigest()
 
 def launch (command):
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -218,7 +226,9 @@ def compile (pluginConfig):
             try:
                 os.makedirs(os.path.join(
                     pluginConfig['project_dir'],
-                    'build', 'images',
+                    'build',
+                    hashConfig(outputConfig),
+                    'images',
                     outputConfig['path']
                 ))
             except os.error:
@@ -247,7 +257,9 @@ def compile (pluginConfig):
 
                 tempFilename = os.path.join(
                     pluginConfig['project_dir'],
-                    'build', 'images',
+                    'build',
+                    hashConfig(outputConfig),
+                    'images',
                     outputConfig['path'],
                     basename
                 )
