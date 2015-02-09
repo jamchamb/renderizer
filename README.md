@@ -28,7 +28,9 @@ icons:
 
       - path: Resources/images/android
         prepend: 'ic_'
-        dpi: 82
+        screen-dpi: 480
+        width-dp: 30
+        height-dp: 30
 
    images:
       - icons/foo.ai
@@ -102,7 +104,10 @@ Since Illustrator accepts a `scaling` property for rendering and not a DPI,
 it is assumed your files were created with a DPI of 72.  If they weren't,
 use the `srcdpi` to specify the source dpi.
 
-Inkscape accepts `width` and `height` properties for exact output dimensions.
+Inkscape accepts pixel and density-independent dimension properties.
+To specify output dimensions in pixels, use `width-px` and `height-px`.
+To specify output dimensions in density-independent pixels, use `width-dp`,
+`height-dp`, and `screen-dpi`, where `screen-dpi` is the target device screen DPI.
 These properties override `dpi` - they're mutually exclusive.
 
 If you create `images/Icon.svg` at 57x57 *points* in inkscape, the above group

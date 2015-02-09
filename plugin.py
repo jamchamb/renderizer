@@ -1,6 +1,7 @@
  #!/usr/bin/env python
 
 import os, subprocess, inspect, yaml, shutil, sys, glob
+from math import ceil
 
 class ModCheck (object):
     """handles checking of modification times to see if we need to
@@ -36,6 +37,9 @@ def launch (command):
         print unicode(err, errors='ignore')
         raise Exception('Command failed, check output')
 
+def dp_to_px (dp, screen_dpi):
+    return int(ceil(dp * (screen_dpi/float(160))))
+
 def illustrator (infile, outfile, outputConfig, pluginConfig):
     """Render an image with illustrator"""
     print 'Rendering', infile, 'to', outfile, 'at dpi', outputConfig['dpi'], 'with Illustrator.'
@@ -60,19 +64,28 @@ def inkscape (infile, outfile, outputConfig, pluginConfig):
     """Render an image with inkscape"""
     command = ["inkscape"]
     
-    # Use width and height properties
-    if 'width' in outputConfig and 'height' in outputConfig:
+    # Use pixel dimension properties (width-px, height-px)
+    if {'width-px', 'height-px'} <= set(outputConfig):
 
-        # Don't allow dpi and width/height to be set
-        if 'dpi' in outputConfig:
-            raise Exception("DPI and dimension properties for Inkscape export are mutually exclusive.") 
-        
-        print 'Rendering', infile, 'to', outfile, 'at', str(outputConfig['width']), 'x', str(outputConfig['height']), 'px with Inkscape.'
+        print 'Rendering', infile, 'to', outfile, 'at', str(outputConfig['width-px']), 'x', str(outputConfig['height-px']), 'px with Inkscape.'
         command.extend([
             "-w",
-            str(outputConfig['width']),
+            str(outputConfig['width-px']),
             "-h",
-            str(outputConfig['height'])
+            str(outputConfig['height-px'])
+        ])
+
+    # Use density-independent pixel dimension properties (width-dp, height-dp, screen-dpi)
+    elif {'width-dp', 'height-dp', 'screen-dpi'} <= set(outputConfig):
+
+        print 'Rendering', infile, 'to', outfile, 'at', str(outputConfig['width-dp']), 'x', str(outputConfig['height-dp']), 'dp for', str(outputConfig['screen-dpi']), 'DPI screen with Inkscape.'
+        width_px = dp_to_px(outputConfig['width-dp'], outputConfig['screen-dpi'])
+        height_px = dp_to_px(outputConfig['height-dp'], outputConfig['screen-dpi'])
+        command.extend([
+            "-w",
+            str(width_px),
+            "-h",
+            str(height_px)
         ])
 
     # Use DPI property
@@ -86,7 +99,11 @@ def inkscape (infile, outfile, outputConfig, pluginConfig):
     else:
         raise Exception("Invalid Inkscape export configuration for " + outfile)
 
-    command.extend(["-e", outfile, infile])
+    command.extend([
+        "-e",
+        outfile,
+        infile
+    ])
         
     launch(command)
 
