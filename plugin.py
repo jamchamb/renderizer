@@ -1,6 +1,6 @@
  #!/usr/bin/env python
 
-import os, subprocess, inspect, yaml, shutil, sys, glob,  hashlib
+import os, subprocess, inspect, yaml, shutil, sys, glob, hashlib
 
 class ModCheck (object):
     """handles checking of modification times to see if we need to
@@ -188,9 +188,7 @@ def compile (pluginConfig):
             try:
                 os.makedirs(os.path.join(
                     pluginConfig['project_dir'],
-                    'build',
-                    hashConfig(outputConfig),
-                    'images',
+                    'build', 'images',
                     outputConfig['path']
                 ))
             except os.error:
@@ -208,22 +206,19 @@ def compile (pluginConfig):
                         basename += outputConfig['append']
                     if 'prepend' in outputConfig:
                         basename = outputConfig['prepend'] + basename
-                    basename += '.png'
 
                 # compute filename and temp filename
                 computedFilename = os.path.join(
                     pluginConfig['project_dir'],
                     outputConfig['path'],
-                    basename
+                    basename + '.png'
                 )
 
                 tempFilename = os.path.join(
                     pluginConfig['project_dir'],
-                    'build',
-                    hashConfig(outputConfig),
-                    'images',
+                    'build', 'images',
                     outputConfig['path'],
-                    basename
+                    basename + '-' + hashConfig(outputConfig) + '.png'
                 )
 
                 # generate path of source image
