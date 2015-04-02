@@ -38,6 +38,7 @@ def launch (command):
         raise Exception('Command failed, check output')
 
 def dp_to_px (dp, screen_dpi):
+    """Translate density-independent pixels to pixels for a given screen DPI."""
     return int(ceil(dp * (screen_dpi/float(160))))
 
 def illustrator (infile, outfile, outputConfig, pluginConfig):
@@ -67,7 +68,7 @@ def inkscape (infile, outfile, outputConfig, pluginConfig):
     # Use pixel dimension properties (width-px, height-px)
     if {'width-px', 'height-px'} <= set(outputConfig):
 
-        print 'Rendering', infile, 'to', outfile, 'at', str(outputConfig['width-px']), 'x', str(outputConfig['height-px']), 'px with Inkscape.'
+        print 'Rendering', infile, 'to', outfile, 'at', outputConfig['width-px'], 'x', outputConfig['height-px'], 'px with Inkscape.'
         command.extend([
             "-w",
             str(outputConfig['width-px']),
@@ -78,7 +79,7 @@ def inkscape (infile, outfile, outputConfig, pluginConfig):
     # Use density-independent pixel dimension properties (width-dp, height-dp, screen-dpi)
     elif {'width-dp', 'height-dp', 'screen-dpi'} <= set(outputConfig):
 
-        print 'Rendering', infile, 'to', outfile, 'at', str(outputConfig['width-dp']), 'x', str(outputConfig['height-dp']), 'dp for', str(outputConfig['screen-dpi']), 'DPI screen with Inkscape.'
+        print 'Rendering', infile, 'to', outfile, 'at', outputConfig['width-dp'], 'x', outputConfig['height-dp'], 'dp for', outputConfig['screen-dpi'], 'DPI screen with Inkscape.'
         width_px = dp_to_px(outputConfig['width-dp'], outputConfig['screen-dpi'])
         height_px = dp_to_px(outputConfig['height-dp'], outputConfig['screen-dpi'])
         command.extend([
