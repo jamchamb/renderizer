@@ -1,6 +1,6 @@
  #!/usr/bin/env python
 
-import os, subprocess, inspect, yaml, shutil, sys, glob
+import os, subprocess, inspect, yaml, shutil, sys, glob, hashlib
 
 class ModCheck (object):
     """handles checking of modification times to see if we need to
@@ -27,6 +27,14 @@ class ModCheck (object):
             return True
         else:
             return False
+
+def hashConfig (yamlConfig):
+    """Generate SHA1 hash of an output or other YAML config."""
+    s = hashlib.sha1();
+    for field in yamlConfig:
+        s.update(field)
+        s.update(str(yamlConfig[field]))
+    return s.hexdigest()
 
 def launch (command):
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -198,20 +206,19 @@ def compile (pluginConfig):
                         basename += outputConfig['append']
                     if 'prepend' in outputConfig:
                         basename = outputConfig['prepend'] + basename
-                    basename += '.png'
 
                 # compute filename and temp filename
                 computedFilename = os.path.join(
                     pluginConfig['project_dir'],
                     outputConfig['path'],
-                    basename
+                    basename + '.png'
                 )
 
                 tempFilename = os.path.join(
                     pluginConfig['project_dir'],
                     'build', 'images',
                     outputConfig['path'],
-                    basename
+                    basename + '-' + hashConfig(outputConfig) + '.png'
                 )
 
                 # generate path of source image
